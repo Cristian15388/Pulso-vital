@@ -1,8 +1,3 @@
--- =============================================================================
--- Pulso Vital - Consultas de Ejemplo (Reconstrucción 6FN y Consultas Temporales)
--- Motor: MySQL 8.0+ (Compatible con MySQL Workbench)
--- =============================================================================
-
 USE pulso_vital;
 
 -- 1. Vista actual consolidada de pacientes (reconstruyendo desde tablas 6FN)
