@@ -1,8 +1,4 @@
--- =============================================================================
--- Pulso Vital - Paso 0: Tabla Universal No Normalizada (0FN)
--- Motor: MySQL 8.0+ (MySQL Workbench)
--- Propósito: Ilustrar las anomalías y problemas de diseño antes de normalizar.
--- =============================================================================
+
 
 CREATE DATABASE IF NOT EXISTS pulso_vital_0fn
     CHARACTER SET utf8mb4
