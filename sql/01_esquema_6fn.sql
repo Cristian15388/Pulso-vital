@@ -1,7 +1,4 @@
--- =============================================================================
--- Pulso Vital - Esquema Final Normalizado en Sexta Forma Normal (6FN)
--- Motor: MySQL 8.0+ (Compatible con MySQL Workbench)
--- =============================================================================
+
 
 CREATE DATABASE IF NOT EXISTS pulso_vital
     CHARACTER SET utf8mb4
