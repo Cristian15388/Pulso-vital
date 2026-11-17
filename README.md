@@ -1,30 +1,46 @@
 # Pulso Vital
 
-## Descripción
+Proyecto académico de diseño de una base de datos relacional para una clínica. Organiza información de pacientes, profesionales, especialidades, citas, consultas, diagnósticos y mediciones clínicas.
 
-Pulso Vital es un proyecto académico enfocado en el diseño y la normalización de una base de datos. Su propósito es organizar la información de forma coherente, reducir la redundancia y mantener la integridad de los datos mediante la aplicación progresiva de las formas normales hasta la sexta forma normal (6FN).
+El esquema principal está descompuesto hasta 6FN: cada tabla de hechos almacena una sola propiedad no clave, mientras que las tablas de identidad y asociación conservan las claves necesarias para reconstruir las relaciones. Esto reduce redundancias, pero requiere más uniones para consultar la información.
 
-## Objetivos
+## Contenido
 
-- Diseñar una estructura de datos clara y consistente.
-- Identificar y reducir duplicidades y dependencias problemáticas.
-- Aplicar las formas normales para mejorar la integridad y facilitar el mantenimiento de la base de datos.
-- Documentar el proceso de normalización y las decisiones de diseño.
+- [`database/schema.sql`](database/schema.sql): crea el esquema principal descompuesto en 6FN para MySQL 8.0.16 o posterior.
+- [`database/6fn_temporal_example.sql`](database/6fn_temporal_example.sql): ejemplo opcional de historial temporal de mediciones y notas.
+- [`docs/modelo-relacional.md`](docs/modelo-relacional.md): entidades, relaciones, cardinalidades y reglas del modelo.
+- [`docs/normalizacion.md`](docs/normalizacion.md): explicación del proceso de normalización hasta 6FN.
 
-## Formas normales consideradas
+## Requisitos
 
-- **Primera forma normal (1FN):** cada campo contiene un valor atómico y no hay grupos repetidos.
-- **Segunda forma normal (2FN):** se cumple 1FN y cada atributo no clave depende de la clave completa, no solo de una parte de una clave compuesta.
-- **Tercera forma normal (3FN):** se cumple 2FN y se eliminan dependencias transitivas entre atributos no clave.
-- **Forma normal de Boyce-Codd (FNBC):** todo determinante de una dependencia funcional es una clave candidata.
-- **Cuarta forma normal (4FN):** se eliminan dependencias multivaluadas no triviales que no estén determinadas por una clave.
-- **Quinta forma normal (5FN):** se eliminan dependencias de reunión no triviales que puedan descomponerse sin pérdida de información.
-- **Sexta forma normal (6FN):** las relaciones se descomponen hasta no admitir descomposiciones adicionales sin pérdida; se utiliza especialmente en diseños que necesitan representar cambios temporales de manera precisa.
+- MySQL 8.0.16 o posterior (para aplicar las restricciones `CHECK`).
+- Un cliente de MySQL, por ejemplo MySQL Workbench o el cliente de línea de comandos.
 
-## Beneficios de la normalización
+## Instalación
 
-La normalización ayuda a evitar anomalías al insertar, actualizar o eliminar información. También permite definir con mayor precisión las relaciones entre los datos y aplicar restricciones que favorezcan su consistencia.
+1. Abre una conexión a un servidor MySQL 8.0.16 o posterior.
+2. Ejecuta `database/schema.sql` una sola vez en una instalación limpia.
+3. Para consultar el esquema, usa la base de datos `pulso_vital`.
 
-## Estado del proyecto
+El script crea la base de datos si no existe. No es un script de migración ni está diseñado para ejecutarse sobre tablas ya creadas. No agrega pacientes ni datos clínicos de ejemplo.
 
-Este repositorio presenta el proyecto y su enfoque de diseño. El esquema, los ejemplos y los archivos de implementación pueden incorporarse conforme avance el desarrollo.
+El ejemplo temporal es opcional: ejecútalo solo después de crear el esquema principal. Crea tablas adicionales con el prefijo `ejemplo_6fn_` dentro de `pulso_vital`.
+
+## Módulos incluidos
+
+- **Pacientes:** datos de identificación y contacto.
+- **Profesionales y especialidades:** catálogo de profesionales y relación muchos a muchos con sus especialidades.
+- **Citas:** paciente, profesional, horario y estado.
+- **Consultas:** registro clínico asociado a una cita.
+- **Diagnósticos:** catálogo y relación muchos a muchos con las consultas.
+- **Mediciones:** catálogo de tipos de medición y valores registrados durante una consulta.
+
+## Diseño en 6FN
+
+Las entidades tienen tablas de identidad y sus atributos se guardan en relaciones separadas. Por ejemplo, los datos de paciente se distribuyen entre `patient`, `patient_given_names`, `patient_family_names` y otras tablas de hechos. Las relaciones de muchos a muchos contienen las claves de la asociación y no repiten atributos descriptivos.
+
+Esta descomposición prioriza el ejercicio académico de normalización por encima de la sencillez de consulta. El detalle de la reconstrucción y las dependencias asumidas está en [`docs/normalizacion.md`](docs/normalizacion.md).
+
+## Alcance
+
+Este es un modelo académico inicial, no un sistema clínico listo para producción. No contiene autenticación, control de acceso, auditoría, facturación, recetas ni requisitos legales específicos. Antes de usarlo con datos reales de salud, se requiere una revisión profesional de seguridad, privacidad y normativa aplicable.
