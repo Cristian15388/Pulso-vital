@@ -1,4 +1,4 @@
-USE pulso_vital;
+USE pulso_vital_6fn_basico;
 
 CREATE TABLE ejemplo_6fn_vital_observation (
     observation_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,

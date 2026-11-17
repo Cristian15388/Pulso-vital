@@ -1,8 +1,8 @@
-CREATE DATABASE IF NOT EXISTS pulso_vital
+CREATE DATABASE IF NOT EXISTS pulso_vital_6fn_basico
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_0900_ai_ci;
 
-USE pulso_vital;
+USE pulso_vital_6fn_basico;
 
 -- Entity tables contain keys only. Each fact is stored in its own relation.
 CREATE TABLE patient (

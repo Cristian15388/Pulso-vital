@@ -1,46 +1,36 @@
 # Pulso Vital
 
-Proyecto académico de diseño de una base de datos relacional para una clínica. Organiza información de pacientes, profesionales, especialidades, citas, consultas, diagnósticos y mediciones clínicas.
+Proyecto académico de diseño y normalización de una base de datos para un sistema de salud. Documenta el proceso desde una tabla inicial sin normalizar hasta 6FN e incluye scripts MySQL, datos de prueba y consultas.
 
-El esquema principal está descompuesto hasta 6FN: cada tabla de hechos almacena una sola propiedad no clave, mientras que las tablas de identidad y asociación conservan las claves necesarias para reconstruir las relaciones. Esto reduce redundancias, pero requiere más uniones para consultar la información.
+## Archivos principales
 
-## Contenido
+- [`docs/normalizacion.md`](docs/normalizacion.md): explicación del proceso 0FN, 1FN, 2FN, 3FN, BCNF, 4FN, 5FN y 6FN.
+- [`sql/00_tabla_no_normalizada.sql`](sql/00_tabla_no_normalizada.sql): ejemplo inicial 0FN.
+- [`sql/01_esquema_6fn.sql`](sql/01_esquema_6fn.sql): esquema clínico extendido con historial temporal.
+- [`sql/02_datos_prueba.sql`](sql/02_datos_prueba.sql): datos de prueba.
+- [`sql/03_consultas_ejemplo.sql`](sql/03_consultas_ejemplo.sql): consultas para reconstruir y analizar los datos.
 
-- [`database/schema.sql`](database/schema.sql): crea el esquema principal descompuesto en 6FN para MySQL 8.0.16 o posterior.
-- [`database/6fn_temporal_example.sql`](database/6fn_temporal_example.sql): ejemplo opcional de historial temporal de mediciones y notas.
-- [`docs/modelo-relacional.md`](docs/modelo-relacional.md): entidades, relaciones, cardinalidades y reglas del modelo.
-- [`docs/normalizacion.md`](docs/normalizacion.md): explicación del proceso de normalización hasta 6FN.
+## Ejecución del esquema extendido
 
-## Requisitos
+Requisitos: MySQL 8.0 o posterior y un cliente como MySQL Workbench.
 
-- MySQL 8.0.16 o posterior (para aplicar las restricciones `CHECK`).
-- Un cliente de MySQL, por ejemplo MySQL Workbench o el cliente de línea de comandos.
+1. Ejecuta `sql/01_esquema_6fn.sql`.
+2. Ejecuta `sql/02_datos_prueba.sql`.
+3. Ejecuta `sql/03_consultas_ejemplo.sql` para probar las consultas.
+4. Opcionalmente, ejecuta `sql/00_tabla_no_normalizada.sql` para revisar la tabla de partida 0FN en la base separada `pulso_vital_0fn`.
 
-## Instalación
+Ejecuta los scripts de creación en una base de datos limpia. El script 0FN es independiente del esquema principal.
 
-1. Abre una conexión a un servidor MySQL 8.0.16 o posterior.
-2. Ejecuta `database/schema.sql` una sola vez en una instalación limpia.
-3. Para consultar el esquema, usa la base de datos `pulso_vital`.
+## Modelo compacto complementario
 
-El script crea la base de datos si no existe. No es un script de migración ni está diseñado para ejecutarse sobre tablas ya creadas. No agrega pacientes ni datos clínicos de ejemplo.
+El directorio [`database/`](database/) contiene otra versión compacta del modelo, descompuesta en relaciones de hechos de 6FN:
 
-El ejemplo temporal es opcional: ejecútalo solo después de crear el esquema principal. Crea tablas adicionales con el prefijo `ejemplo_6fn_` dentro de `pulso_vital`.
+- [`database/schema.sql`](database/schema.sql): crea `pulso_vital_6fn_basico`.
+- [`database/6fn_temporal_example.sql`](database/6fn_temporal_example.sql): agrega un ejemplo de historial temporal a ese esquema.
+- [`docs/modelo-relacional.md`](docs/modelo-relacional.md): describe las entidades y relaciones de esta versión compacta.
 
-## Módulos incluidos
-
-- **Pacientes:** datos de identificación y contacto.
-- **Profesionales y especialidades:** catálogo de profesionales y relación muchos a muchos con sus especialidades.
-- **Citas:** paciente, profesional, horario y estado.
-- **Consultas:** registro clínico asociado a una cita.
-- **Diagnósticos:** catálogo y relación muchos a muchos con las consultas.
-- **Mediciones:** catálogo de tipos de medición y valores registrados durante una consulta.
-
-## Diseño en 6FN
-
-Las entidades tienen tablas de identidad y sus atributos se guardan en relaciones separadas. Por ejemplo, los datos de paciente se distribuyen entre `patient`, `patient_given_names`, `patient_family_names` y otras tablas de hechos. Las relaciones de muchos a muchos contienen las claves de la asociación y no repiten atributos descriptivos.
-
-Esta descomposición prioriza el ejercicio académico de normalización por encima de la sencillez de consulta. El detalle de la reconstrucción y las dependencias asumidas está en [`docs/normalizacion.md`](docs/normalizacion.md).
+Las versiones crean bases de datos distintas (`pulso_vital` y `pulso_vital_6fn_basico`), por lo que pueden coexistir. Para cada versión, ejecuta sus scripts sobre una base limpia.
 
 ## Alcance
 
-Este es un modelo académico inicial, no un sistema clínico listo para producción. No contiene autenticación, control de acceso, auditoría, facturación, recetas ni requisitos legales específicos. Antes de usarlo con datos reales de salud, se requiere una revisión profesional de seguridad, privacidad y normativa aplicable.
+El proyecto es académico y no está listo para manejar información clínica real. Antes de un uso real se requieren controles de acceso, auditoría, privacidad, seguridad y revisión de la normativa aplicable.
