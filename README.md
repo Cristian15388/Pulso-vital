@@ -4,11 +4,17 @@ Proyecto académico de diseño y normalización de una base de datos para un sis
 
 ## Archivos principales
 
+- [`web/index.html`](web/index.html): presentación web interactiva del proyecto.
+- [`web/styles.css`](web/styles.css): estilos responsive de la página.
 - [`docs/normalizacion.md`](docs/normalizacion.md): explicación del proceso 0FN, 1FN, 2FN, 3FN, BCNF, 4FN, 5FN y 6FN.
 - [`sql/00_tabla_no_normalizada.sql`](sql/00_tabla_no_normalizada.sql): ejemplo inicial 0FN.
 - [`sql/01_esquema_6fn.sql`](sql/01_esquema_6fn.sql): esquema clínico extendido con historial temporal.
 - [`sql/02_datos_prueba.sql`](sql/02_datos_prueba.sql): datos de prueba.
 - [`sql/03_consultas_ejemplo.sql`](sql/03_consultas_ejemplo.sql): consultas para reconstruir y analizar los datos.
+
+## Ver la página web
+
+Abre `web/index.html` directamente en un navegador. La página es estática, no requiere instalar dependencias y permite explorar las etapas, el modelo lógico y los archivos del proyecto.
 
 ## Ejecución del esquema extendido
 
