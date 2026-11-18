@@ -2,6 +2,10 @@
 
 Proyecto académico de diseño y normalización de una base de datos para un sistema de salud. Documenta el proceso desde una tabla inicial sin normalizar hasta 6FN e incluye scripts MySQL, datos de prueba y consultas.
 
+## Presentación en YouTube
+
+[Ver la presentación del proyecto Pulso Vital](https://youtu.be/7CQyMboQCzY)
+
 ## Archivos principales
 
 - [`web/index.html`](web/index.html): presentación web interactiva del proyecto.
