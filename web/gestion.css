@@ -13,7 +13,6 @@
 * { box-sizing: border-box; }
 
 body {
-  min-width: 320px;
   min-height: 100vh;
   margin: 0;
   color: var(--ink);
@@ -201,6 +200,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 
 @media (max-width: 420px) {
+  .app-header { padding-right: 12px; padding-left: 12px; }
   .back-link { display: none; }
   .local-badge { font-size: 9px; }
   .page-heading h1 { font-size: 29px; }
