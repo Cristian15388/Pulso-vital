@@ -61,3 +61,9 @@ erDiagram
 ## Archivo SQL
 
 El esquema 6FN ejecutable está en [`../database/schema.sql`](../database/schema.sql). El ejemplo adicional de historial temporal está en [`../database/6fn_temporal_example.sql`](../database/6fn_temporal_example.sql).
+
+## Registro local de pacientes y administrativos
+
+La aplicación local usa el esquema extendido `pulso_vital`: los pacientes se guardan en `pacientes` y en sus relaciones de nombres, apellidos y teléfono. Los administrativos tienen una tabla de identidad y relaciones separadas para nombre, apellido, cargo, teléfono y correo, con historial de vigencia. El detalle de sus claves foráneas está en [`../sql/04_registro_app.sql`](../sql/04_registro_app.sql).
+
+La página de gestión se sirve desde el backend local [`../server/index.js`](../server/index.js). La interfaz muestra a los administrativos generados con información ficticia y permite agregar registros; no es una aplicación pública ni está preparada para datos clínicos reales.

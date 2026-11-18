@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123c38">
+  <meta name="description" content="Registro local de pacientes y personal administrativo de Pulso Vital.">
+  <title>Registro clínico — Pulso Vital</title>
+  <link rel="stylesheet" href="gestion.css">
+  <script src="gestion.js" defer></script>
+</head>
+<body>
+  <header class="app-header">
+    <a class="brand" href="/" aria-label="Volver a la página de Pulso Vital">
+      <span class="brand-mark" aria-hidden="true">+</span>
+      <span>Pulso<span>Vital</span></span>
+    </a>
+    <div class="header-right">
+      <a class="back-link" href="/">Página del proyecto</a>
+      <span class="local-badge"><span></span> Sistema local</span>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <section class="page-heading">
+      <div>
+        <p class="eyebrow">GESTIÓN DE LA CLÍNICA</p>
+        <h1>Registro de personas</h1>
+        <p class="lede">Administra el personal y registra a cada paciente que llega a la clínica.</p>
+      </div>
+      <div class="db-status" id="database-status" role="status" aria-live="polite">
+        <span class="status-indicator"></span>
+        <span id="database-status-text">Conectando con la base de datos…</span>
+      </div>
+    </section>
+
+    <section class="summary-grid" aria-label="Resumen de registros">
+      <article class="summary-card">
+        <span class="summary-icon patient-icon" aria-hidden="true">P</span>
+        <span class="summary-copy"><small>PACIENTES REGISTRADOS</small><strong id="patient-count">—</strong></span>
+        <span class="summary-caption">Base de datos clínica</span>
+      </article>
+      <article class="summary-card">
+        <span class="summary-icon staff-icon" aria-hidden="true">A</span>
+        <span class="summary-copy"><small>PERSONAL ADMINISTRATIVO</small><strong id="administrator-count">—</strong></span>
+        <span class="summary-caption">Incluye datos de demostración</span>
+      </article>
+    </section>
+
+    <section class="records-panel" aria-labelledby="records-title">
+      <div class="panel-top">
+        <div>
+          <p class="eyebrow">DIRECTORIO</p>
+          <h2 id="records-title">Registros de la clínica</h2>
+        </div>
+        <button class="button button-primary" id="add-record" type="button">
+          <span aria-hidden="true">＋</span> <span id="add-record-label">Registrar paciente</span>
+        </button>
+      </div>
+
+      <div class="toolbar">
+        <div class="tabs" role="tablist" aria-label="Tipo de registros">
+          <button class="tab is-active" id="patients-tab" type="button" role="tab" aria-selected="true" aria-controls="records-table" data-view="patients">
+            Pacientes <span class="tab-count" id="patient-tab-count">0</span>
+          </button>
+          <button class="tab" id="administrators-tab" type="button" role="tab" aria-selected="false" aria-controls="records-table" data-view="administrators">
+            Administrativos <span class="tab-count" id="administrator-tab-count">0</span>
+          </button>
+        </div>
+        <div class="table-actions">
+          <label class="search-box">
+            <span aria-hidden="true">⌕</span>
+            <input id="search-records" type="search" placeholder="Buscar por nombre o documento" autocomplete="off">
+          </label>
+          <button class="button button-secondary" id="refresh-records" type="button" title="Actualizar registros">
+            <span aria-hidden="true">↻</span><span class="button-label">Actualizar</span>
+          </button>
+          <button class="button button-secondary" id="export-records" type="button" title="Descargar la tabla como CSV">
+            <span aria-hidden="true">↓</span><span class="button-label">Exportar</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="message-bar" id="message-bar" role="status" aria-live="polite" hidden></div>
+      <div class="table-wrap">
+        <table id="records-table" aria-describedby="table-caption">
+          <caption id="table-caption" class="visually-hidden">Registros almacenados en MySQL</caption>
+          <thead id="records-head"></thead>
+          <tbody id="records-body">
+            <tr><td class="table-message" colspan="6">Cargando registros…</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-footer">
+        <span id="table-result-count">Cargando datos…</span>
+        <span><span class="secure-dot"></span> Los cambios se guardan en MySQL</span>
+      </div>
+    </section>
+
+    <p class="privacy-note">
+      <span aria-hidden="true">i</span>
+      Aplicación académica local. Los administrativos de ejemplo son ficticios. No ingreses información clínica real ni publiques este servidor en internet.
+    </p>
+  </main>
+
+  <dialog class="record-dialog" id="record-dialog" aria-labelledby="dialog-title">
+    <form id="record-form" novalidate>
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow" id="dialog-eyebrow">NUEVO REGISTRO</p>
+          <h2 id="dialog-title">Registrar paciente</h2>
+        </div>
+        <button class="icon-button" id="close-dialog" type="button" aria-label="Cerrar formulario">×</button>
+      </div>
+      <p class="form-intro" id="form-intro">Completa los datos de identificación y contacto del paciente.</p>
+
+      <div class="form-grid">
+        <label class="field field-wide">
+          <span>Tipo de documento <b>*</b></span>
+          <select name="documentType" required>
+            <option value="">Selecciona un tipo</option>
+            <option value="CC">Cédula de ciudadanía (CC)</option>
+            <option value="TI">Tarjeta de identidad (TI)</option>
+            <option value="CE">Cédula de extranjería (CE)</option>
+            <option value="PA">Pasaporte (PA)</option>
+            <option value="RC">Registro civil (RC)</option>
+          </select>
+        </label>
+        <label class="field field-wide">
+          <span>Número de documento <b>*</b></span>
+          <input name="documentNumber" type="text" minlength="3" maxlength="30" autocomplete="off" required>
+        </label>
+        <label class="field">
+          <span>Nombres <b>*</b></span>
+          <input name="givenNames" type="text" minlength="2" maxlength="100" autocomplete="given-name" required>
+        </label>
+        <label class="field">
+          <span>Apellidos <b>*</b></span>
+          <input name="familyNames" type="text" minlength="2" maxlength="100" autocomplete="family-name" required>
+        </label>
+        <label class="field patient-field">
+          <span>Fecha de nacimiento <b>*</b></span>
+          <input name="birthDate" type="date" autocomplete="bday" required>
+        </label>
+        <label class="field administrator-field" hidden>
+          <span>Cargo <b>*</b></span>
+          <select name="roleId" id="role-select">
+            <option value="">Cargando cargos…</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Teléfono</span>
+          <input name="phone" type="tel" maxlength="30" autocomplete="tel">
+        </label>
+        <label class="field administrator-field" hidden>
+          <span>Correo electrónico</span>
+          <input name="email" type="email" maxlength="254" autocomplete="email">
+        </label>
+      </div>
+
+      <p class="form-error" id="form-error" role="alert" hidden></p>
+      <div class="dialog-actions">
+        <button class="button button-secondary" id="cancel-dialog" type="button">Cancelar</button>
+        <button class="button button-primary" id="save-record" type="submit">Guardar registro</button>
+      </div>
+      <p class="required-note"><b>*</b> Campos obligatorios. El registro queda guardado en la base de datos de la clínica.</p>
+    </form>
+  </dialog>
+</body>
+</html>

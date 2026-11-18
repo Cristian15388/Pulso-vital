@@ -6,15 +6,34 @@ Proyecto académico de diseño y normalización de una base de datos para un sis
 
 - [`web/index.html`](web/index.html): presentación web interactiva del proyecto.
 - [`web/styles.css`](web/styles.css): estilos responsive de la página.
+- [`web/gestion.html`](web/gestion.html): pantalla local para registrar pacientes y administrativos y consultar sus tablas.
+- [`server/index.js`](server/index.js): API local que valida y guarda registros en MySQL.
 - [`docs/normalizacion.md`](docs/normalizacion.md): explicación del proceso 0FN, 1FN, 2FN, 3FN, BCNF, 4FN, 5FN y 6FN.
 - [`sql/00_tabla_no_normalizada.sql`](sql/00_tabla_no_normalizada.sql): ejemplo inicial 0FN.
 - [`sql/01_esquema_6fn.sql`](sql/01_esquema_6fn.sql): esquema clínico extendido con historial temporal.
 - [`sql/02_datos_prueba.sql`](sql/02_datos_prueba.sql): datos de prueba.
 - [`sql/03_consultas_ejemplo.sql`](sql/03_consultas_ejemplo.sql): consultas para reconstruir y analizar los datos.
+- [`sql/04_registro_app.sql`](sql/04_registro_app.sql): tablas normalizadas de administrativos y catálogo de cargos.
 
 ## Ver la página web
 
 Abre `web/index.html` directamente en un navegador. La página es estática, no requiere instalar dependencias y permite explorar las etapas, el modelo lógico y los archivos del proyecto.
+
+## Ejecutar el registro de pacientes y administrativos
+
+La pantalla de registro necesita Node.js 18 o posterior, un backend y MySQL; no guarda datos cuando se abre como archivo ni cuando se sirve solo desde GitHub Pages.
+
+1. Inicia el servicio local MySQL.
+2. En MySQL Workbench, ejecuta `sql/01_esquema_6fn.sql` para crear `pulso_vital`.
+3. Opcionalmente, ejecuta `sql/02_datos_prueba.sql` para cargar pacientes ficticios de ejemplo.
+4. Ejecuta `sql/04_registro_app.sql` para agregar los cargos y las relaciones administrativas normalizadas.
+5. Copia `.env.example` a `.env` (en PowerShell: `Copy-Item .env.example .env`) y configura la contraseña de MySQL y el puerto de tu servidor. No subas `.env` a GitHub.
+6. Desde la carpeta del proyecto, ejecuta `npm install` y luego `npm start`.
+7. Abre `http://127.0.0.1:3000/gestion.html`.
+
+En el primer inicio sin administrativos se generan cinco registros ficticios aleatorios para demostración. La página permite agregar administrativos y pacientes; los registros se guardan en las tablas de MySQL. La tabla incluye búsqueda, actualización y exportación CSV.
+
+El servidor escucha solo en `127.0.0.1`; no lo expongas a internet ni ingreses datos reales de pacientes en esta aplicación académica sin controles de privacidad y seguridad.
 
 ## Ejecución del esquema extendido
 

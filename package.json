@@ -1,0 +1,20 @@
+{
+  "name": "pulso-vital-clinic-registry",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Registro local de pacientes y administrativos para Pulso Vital",
+  "main": "server/index.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "check": "node --check server/index.js && node --check server/validation.js && node --check web/gestion.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mysql2": "^3.14.1"
+  }
+}
