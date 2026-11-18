@@ -75,7 +75,7 @@ function renderTable() {
   const isPatientView = state.view === 'patients';
   const columns = isPatientView
     ? ['ID', 'Paciente', 'Documento', 'Nacimiento', 'Teléfono', 'Fecha de ingreso']
-    : ['ID', 'Administrativo', 'Documento', 'Cargo', 'Teléfono', 'Correo electrónico', 'Fecha de ingreso'];
+    : ['ID', 'Personal', 'Documento', 'Cargo', 'Teléfono', 'Correo electrónico', 'Fecha de ingreso'];
   const rows = visibleRows();
 
   elements.tableHead.innerHTML = `<tr>${columns.map((column) => `<th scope="col">${column}</th>`).join('')}</tr>`;
@@ -83,7 +83,7 @@ function renderTable() {
     const emptyMessage = elements.search.value.trim()
       ? 'No se encontraron registros con esa búsqueda.'
       : isPatientView ? 'Todavía no hay pacientes registrados. Usa “Registrar paciente” para agregar el primero.'
-        : 'No hay administrativos registrados.';
+        : 'No hay personal de la clínica registrado.';
     elements.tableBody.innerHTML = `<tr><td class="table-message" colspan="${columns.length}">${emptyMessage}</td></tr>`;
   } else {
     elements.tableBody.innerHTML = rows.map((record) => {
@@ -168,12 +168,14 @@ async function loadRecords() {
     setStatus(true, `Conectado · ${health.database}`);
     clearMessage();
     renderTable();
+    return true;
   } catch (error) {
     setStatus(false, 'Sin conexión con MySQL');
     showMessage(`${error.message} Revisa que el servidor MySQL esté iniciado y que la configuración de .env sea correcta.`, 'message-error');
     elements.tableBody.innerHTML = '<tr><td class="table-message" colspan="7">No se pudieron cargar los datos. Cuando MySQL esté conectado, pulsa “Actualizar”.</td></tr>';
     elements.resultCount.textContent = 'No se pudo consultar la base de datos';
     console.error('Error al cargar los registros:', error);
+    return false;
   } finally {
     elements.refresh.disabled = false;
   }
@@ -187,7 +189,7 @@ function setView(view) {
     tab.setAttribute('aria-selected', String(isActive));
   });
   const isPatientView = view === 'patients';
-  elements.addRecordLabel.textContent = isPatientView ? 'Registrar paciente' : 'Agregar administrativo';
+  elements.addRecordLabel.textContent = isPatientView ? 'Registrar paciente' : 'Agregar personal';
   elements.search.placeholder = isPatientView ? 'Buscar por nombre o documento' : 'Buscar por nombre, cargo o documento';
   renderTable();
   clearMessage();
@@ -198,11 +200,11 @@ function openForm() {
   elements.form.reset();
   elements.formError.hidden = true;
   elements.formError.textContent = '';
-  elements.dialogTitle.textContent = isPatientView ? 'Registrar paciente' : 'Agregar administrativo';
-  elements.dialogEyebrow.textContent = isPatientView ? 'NUEVO PACIENTE' : 'NUEVO ADMINISTRATIVO';
+  elements.dialogTitle.textContent = isPatientView ? 'Registrar paciente' : 'Agregar personal';
+  elements.dialogEyebrow.textContent = isPatientView ? 'NUEVO PACIENTE' : 'NUEVO PERSONAL';
   elements.formIntro.textContent = isPatientView
     ? 'Completa los datos de identificación y contacto del paciente.'
-    : 'Completa los datos del administrativo que trabaja en la clínica.';
+    : 'Completa los datos de la persona que trabaja en la clínica.';
   document.querySelectorAll('.patient-field').forEach((field) => {
     field.hidden = !isPatientView;
     field.querySelectorAll('input, select').forEach((input) => { input.required = isPatientView; });
@@ -236,9 +238,14 @@ async function saveRecord(event) {
       method: 'POST',
       body: JSON.stringify(record)
     });
+    elements.search.value = '';
     closeForm();
-    await loadRecords();
-    showMessage(result.message, 'message-success');
+    const recordsLoaded = await loadRecords();
+    if (recordsLoaded) {
+      showMessage(result.message, 'message-success');
+    } else {
+      showMessage(`${result.message} El registro se guardó, pero no se pudo actualizar la tabla. Pulsa “Actualizar” para volver a intentarlo.`, 'message-error');
+    }
   } catch (error) {
     elements.formError.textContent = error.message;
     elements.formError.hidden = false;
@@ -286,6 +293,6 @@ elements.dialog.addEventListener('click', (event) => {
 loadRoles().catch((error) => {
   elements.roleSelect.innerHTML = '<option value="">No se pudieron cargar los cargos</option>';
   showMessage(error.message, 'message-error');
-  console.error('Error al cargar los cargos administrativos:', error);
+  console.error('Error al cargar los cargos de la clínica:', error);
 });
 loadRecords();

@@ -23,7 +23,6 @@ const pool = mysql.createPool({
 
 const demoGivenNames = ['Valentina', 'Mateo', 'Lucía', 'Samuel', 'Camila', 'Tomás', 'Sara', 'Nicolás'];
 const demoFamilyNames = ['Rojas', 'Mendoza', 'Castro', 'Vargas', 'Navarro', 'Cárdenas', 'Pardo', 'Salazar'];
-const demoRoles = ['recepcion', 'archivo', 'facturacion', 'coordinacion', 'admisiones'];
 
 app.disable('x-powered-by');
 app.use(express.json({ limit: '16kb' }));
@@ -44,13 +43,12 @@ async function seedDemoAdministrators() {
   const [[{ total }]] = await pool.query('SELECT COUNT(*) AS total FROM administrativos');
   if (Number(total) > 0) return;
 
-  const [roles] = await pool.execute(
-    `SELECT id_cargo, codigo FROM cargos_administrativos WHERE codigo IN (${demoRoles.map(() => '?').join(', ')})`,
-    demoRoles
+  const [roles] = await pool.query(
+    'SELECT id_cargo FROM cargos_administrativos ORDER BY id_cargo'
   );
-  const roleIds = new Map(roles.map((role) => [role.codigo, role.id_cargo]));
-  if (roleIds.size !== demoRoles.length) {
-    throw new Error('Faltan cargos administrativos. Ejecuta sql/04_registro_app.sql.');
+  const roleIds = roles.map((role) => role.id_cargo);
+  if (roleIds.length === 0) {
+    throw new Error('No hay cargos cargados. Ejecuta sql/04_registro_app.sql.');
   }
 
   const connection = await pool.getConnection();
@@ -68,7 +66,7 @@ async function seedDemoAdministrators() {
       const suffix = crypto.randomBytes(4).toString('hex');
       const givenNames = `${demoGivenNames[crypto.randomInt(demoGivenNames.length)]} ${demoGivenNames[crypto.randomInt(demoGivenNames.length)]}`;
       const familyNames = `${demoFamilyNames[crypto.randomInt(demoFamilyNames.length)]} ${demoFamilyNames[crypto.randomInt(demoFamilyNames.length)]}`;
-      const roleCode = demoRoles[crypto.randomInt(demoRoles.length)];
+      const roleId = roleIds[crypto.randomInt(roleIds.length)];
       const [{ insertId }] = await connection.execute(
         'INSERT INTO administrativos (tipo_documento, numero_documento) VALUES (?, ?)',
         ['CC', `DEMO-${suffix.toUpperCase()}`]
@@ -83,7 +81,7 @@ async function seedDemoAdministrators() {
       );
       await connection.execute(
         'INSERT INTO administrativo_cargo_hist (id_administrativo, valido_desde, id_cargo) VALUES (?, NOW(), ?)',
-        [insertId, roleIds.get(roleCode)]
+        [insertId, roleId]
       );
       await connection.execute(
         'INSERT INTO administrativo_telefono_hist (id_administrativo, valido_desde, telefono) VALUES (?, NOW(), ?)',
@@ -95,7 +93,7 @@ async function seedDemoAdministrators() {
       );
     }
     await connection.commit();
-    console.info('Se crearon cinco administrativos ficticios de demostración.');
+    console.info('Se crearon cinco registros ficticios de personal para demostración.');
   } catch (error) {
     await connection.rollback();
     throw error;
@@ -242,7 +240,7 @@ app.post('/api/administrators', async (req, res) => {
   const errors = validatePerson(body, false);
   if (body.email && !validateEmail(body.email)) errors.push('Escribe un correo electrónico válido.');
   if (!Number.isInteger(Number(body.roleId)) || Number(body.roleId) < 1) {
-    errors.push('Selecciona un cargo administrativo válido.');
+    errors.push('Selecciona un cargo válido.');
   }
   if (errors.length) return validationError(res, errors);
 
