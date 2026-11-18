@@ -4,7 +4,7 @@ Proyecto académico de diseño y normalización de una base de datos para un sis
 
 ## Presentación en YouTube
 
-[Ver la presentación del proyecto Pulso Vital](https://youtu.be/t9gsdHv6IN4)
+[Ver la presentación del proyecto Pulso Vital](https://youtu.be/NN-hsD9du2E?si=zNE7fB902Z76kadd)
 
 ## Archivos principales
 
